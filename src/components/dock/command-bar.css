@@ -1,0 +1,266 @@
+/*
+ * ThreeUI AnimatedTopDock, Command Bar variant (`modern`, source rev 5a736cd),
+ * ported to the Opsvo light theme. Kept from the source: the inset bar that
+ * hugs its own content, the dock centred in it with a locked track (the
+ * controller's lockTrack) so growing items never shove the brand or actions,
+ * container-query sizing, and the <=900px collapse to icons.
+ * Changes, all for brand/tokens.md:
+ * - dark palette and gradients -> colour tokens; active item and CTA use the
+ *   accent; no aurora (no gradients or glows)
+ * - 999px pills -> --radius-lg / --radius-md ("No pill buttons")
+ * - items and actions 44px tall (touch-target token), --text-small labels
+ * - transitions on --duration-* / --ease
+ * - Sign in stays until 600px (the source hides it at 900 with nowhere to go);
+ *   below 600px the dock hands over to the labelled Menu panel instead of
+ *   28px icon-only links
+ */
+
+.cmdbar-frame {
+  container-type: inline-size;
+  padding-top: clamp(12px, 2.2cqw, 32px);
+  --atd-bar-width: min(1240px, calc(100% - clamp(24px, 5cqw, 120px)));
+  --atd-bar-pad: clamp(5px, 0.42cqw, 9px);
+  --atd-bar-lead: clamp(14px, 1.15cqw, 25px);
+  --atd-item-height: 44px;
+  --atd-item-pad: clamp(10px, 0.86cqw, 18px);
+  --atd-icon: clamp(13px, 0.92cqw, 19px);
+  --atd-gap: clamp(5px, 0.44cqw, 9px);
+  --atd-action-height: 44px;
+}
+
+.cmdbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(14px, 2.4cqw, 40px);
+  width: max-content;
+  max-width: var(--atd-bar-width);
+  margin: 0 auto;
+  padding: var(--atd-bar-pad) var(--atd-bar-pad) var(--atd-bar-pad) var(--atd-bar-lead);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
+  box-shadow:
+    0 22px 52px -24px color-mix(in srgb, var(--color-primary) 28%, transparent),
+    inset 0 1px color-mix(in srgb, var(--color-surface) 70%, transparent);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.cmdbar__brand {
+  flex: none;
+  color: var(--color-primary);
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.cmdbar__dock {
+  display: flex;
+  flex: none;
+  gap: clamp(2px, 0.2cqw, 5px);
+  align-items: flex-start;
+  /* one item tall, rest width wide, row centred: a growing item overflows
+     evenly without moving a neighbour */
+  justify-content: center;
+  height: var(--atd-item-height);
+}
+
+.cmdbar__item {
+  display: inline-flex;
+  flex: none;
+  gap: var(--atd-gap);
+  align-items: center;
+  justify-content: center;
+  height: var(--atd-item-height);
+  padding: 0 var(--atd-item-pad);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-secondary);
+  background: transparent;
+  font-size: var(--text-small);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-decoration: none;
+  transform-origin: 50% 0;
+  will-change: width, height, transform;
+  transition:
+    color 120ms var(--ease-opsvo),
+    border-color var(--default-transition-duration) var(--ease-opsvo),
+    background var(--default-transition-duration) var(--ease-opsvo),
+    box-shadow var(--default-transition-duration) var(--ease-opsvo);
+}
+
+/* :hover rides with the proximity flag so the state still lands when the
+   spring is off (reduced motion, coarse pointer) */
+.cmdbar__item[data-dock-near="true"],
+.cmdbar__item:hover,
+.cmdbar__item:focus-visible {
+  color: var(--color-primary);
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 8px 20px -14px color-mix(in srgb, var(--color-primary) 45%, transparent);
+}
+
+.cmdbar__item[aria-current="location"] {
+  color: var(--color-surface);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+
+.cmdbar__icon {
+  display: inline-flex;
+  flex: none;
+  width: var(--atd-icon);
+  height: var(--atd-icon);
+  opacity: 0.72;
+  transition: opacity 120ms var(--ease-opsvo);
+}
+
+.cmdbar__icon svg,
+.cmdbar__cta svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cmdbar__item[data-dock-near="true"] .cmdbar__icon,
+.cmdbar__item[aria-current="location"] .cmdbar__icon {
+  opacity: 1;
+}
+
+.cmdbar__actions {
+  display: inline-flex;
+  flex: none;
+  gap: clamp(4px, 0.34cqw, 8px);
+  align-items: center;
+}
+
+.cmdbar__ghost {
+  height: var(--atd-action-height);
+  padding: 0 clamp(12px, 0.95cqw, 20px);
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-secondary);
+  background: transparent;
+  font-size: var(--text-small);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color 120ms var(--ease-opsvo),
+    background 120ms var(--ease-opsvo);
+}
+
+.cmdbar__ghost:hover {
+  color: var(--color-primary);
+  background: var(--color-subtle);
+}
+
+.cmdbar__cta {
+  display: inline-flex;
+  gap: var(--atd-gap);
+  align-items: center;
+  height: var(--atd-action-height);
+  padding: 0 var(--atd-bar-pad) 0 clamp(14px, 1.1cqw, 24px);
+  border-radius: var(--radius-md);
+  color: var(--color-surface);
+  background: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 10px 26px -14px color-mix(in srgb, var(--color-accent) 90%, transparent);
+  transition:
+    transform var(--default-transition-duration) var(--ease-opsvo),
+    box-shadow var(--default-transition-duration) var(--ease-opsvo),
+    background 120ms var(--ease-opsvo);
+}
+
+.cmdbar__cta svg {
+  box-sizing: border-box;
+  width: calc(var(--atd-action-height) - 14px);
+  height: calc(var(--atd-action-height) - 14px);
+  padding: clamp(5px, 0.35cqw, 7px);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 16%, transparent);
+  stroke-width: 1.4;
+}
+
+.cmdbar__cta:hover {
+  background: var(--color-accent-hover);
+  box-shadow: 0 16px 32px -14px var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.cmdbar__brand:focus-visible,
+.cmdbar__item:focus-visible,
+.cmdbar__ghost:focus-visible,
+.cmdbar__cta:focus-visible,
+.cmdbar__menu:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Menu button: only below 600px, where the dock hands over to the panel. */
+.cmdbar__menu {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  height: var(--atd-action-height);
+  padding: 0 12px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+/* Source collapse: labels hide, the CTA drops to its glyph. */
+@container (max-width: 900px) {
+  .cmdbar__item span:last-child,
+  .cmdbar__cta span {
+    display: none;
+  }
+
+  .cmdbar__item {
+    width: var(--atd-item-height);
+    padding: 0;
+  }
+
+  .cmdbar__cta {
+    padding: 0 var(--atd-bar-pad);
+  }
+}
+
+@media (max-width: 599px) {
+  .cmdbar__dock,
+  .cmdbar__ghost {
+    display: none;
+  }
+
+  .cmdbar__menu {
+    display: inline-flex;
+  }
+
+  .cmdbar {
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmdbar__item {
+    transform: none !important;
+  }
+}
