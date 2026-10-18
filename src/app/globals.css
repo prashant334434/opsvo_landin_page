@@ -1,28 +1,24 @@
 @import "tailwindcss";
 
-/* Opsvo Design System — Calm. Evidence-led. Human-first. */
 @theme {
-  /* 02 Color tokens: warm cream + deep forest green */
   --color-canvas: #f8f5ec;
-  --color-sand: #eee8db; /* image fallbacks, pills, trust band */
+  --color-sand: #eee8db;
   --color-surface: #fffdf8;
   --color-subtle: #f2eee3;
   --color-primary: #151916;
   --color-secondary: #686b62;
   --color-border: #e8e2d6;
-  --color-border-strong: #8a8c84; /* interactive outlines: 3:1 */
+  --color-border-strong: #8a8c84;
   --color-accent: #0d3f30;
   --color-accent-hover: #14513e;
-  --color-sage: #617a68; /* icons, check marks, dots */
+  --color-sage: #617a68;
   --color-success: #46694d;
   --color-warning: #8a5a19;
   --color-danger: #aa3f38;
-  /* Hero film palette (editorial brief) */
   --color-ivory: #f2f0ec;
-  --color-charcoal: #0d0c0b; /* near-black; secondary text uses /65 */
+  --color-charcoal: #0d0c0b;
   --color-forest: #34483d;
 
-  /* 03 Typography */
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-editorial: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
   --text-display: clamp(2.5rem, 4vw, 3rem);
@@ -41,17 +37,14 @@
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1.45;
 
-  /* 04 Spacing: Tailwind's default 4px scale already covers 4–96 (p-1 … p-24) */
-  --spacing-tap: 2.75rem; /* 44px minimum touch target */
+  --spacing-tap: 2.75rem;
 
-  /* 05 Radius */
   --radius-sm: 4px;
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  /* 06 Motion */
   --ease-opsvo: cubic-bezier(0.2, 0, 0.3, 1);
-  --ease-soft: cubic-bezier(0.22, 0.8, 0.24, 1); /* long, settling ease for reveals and miniatures */
+  --ease-soft: cubic-bezier(0.22, 0.8, 0.24, 1);
   --default-transition-timing-function: var(--ease-opsvo);
   --default-transition-duration: 180ms;
   --animate-fade-in: fade-in 180ms var(--ease-opsvo);
@@ -81,15 +74,12 @@ body {
   html { scroll-behavior: auto; }
 }
 
-/* Load intro (Intro.tsx): never shown under reduced motion; hidden after 8s if JS fails. */
 @keyframes intro-failsafe { to { visibility: hidden; } }
 .intro { animation: intro-failsafe 0s 8s forwards; }
 @media (prefers-reduced-motion: reduce) {
   .intro { display: none; }
 }
 
-/* Interactive cards (How it works). `lit` = hovered with a fine pointer, keyboard-focused,
-   or tapped open on touch; hover is gated so touch never gets sticky hover states. */
 @custom-variant lit {
   @media (hover: hover) {
     :where([data-card]:hover) & { @slot; }
@@ -97,14 +87,12 @@ body {
   :where([data-card]:is(:focus-visible, [data-open])) & { @slot; }
 }
 
-/* Pointer tilt surface: useTilt() writes --rx/--ry (deg); the shadow leans with the tilt. */
 @utility tilt {
   transform: rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
   transform-style: preserve-3d;
   box-shadow: calc(var(--ry, 0) * -1.4px) calc(20px + var(--rx, 0) * 1.4px) 44px -30px rgb(13 12 11 / 0.2);
 }
 
-/* Miniature UI motion: one restrained timing for every layered element. */
 @utility mini {
   transition-property: translate, opacity, clip-path, box-shadow, background-color, color;
   transition-duration: 520ms;
@@ -112,8 +100,6 @@ body {
   @media (prefers-reduced-motion: reduce) { transition-duration: 0ms; }
 }
 
-/* Scroll entrance: hidden only after useReveal() arms the section, so content never
-   depends on JS; plays once. Stagger with style={stagger(i)}. */
 @utility reveal {
   transition: opacity 760ms var(--ease-soft), translate 760ms var(--ease-soft);
   transition-delay: calc(var(--i, 0) * 90ms);
@@ -123,15 +109,12 @@ body {
   }
 }
 
-/* Layout: 1320px content column, fluid gutters */
 @utility wrap {
   @apply mx-auto w-full max-w-[1530px] px-5 md:px-[clamp(24px,6.8vw,105px)];
 }
-/* Background-image slot; pair with style={bg("/images/…")} */
 @utility photo {
   @apply bg-sand bg-cover bg-center;
 }
-/* 07 Buttons */
 @utility btn {
   @apply inline-flex min-h-11 items-center justify-center gap-2.5 whitespace-nowrap rounded-md border border-transparent px-5 text-[13px] font-semibold transition hover:-translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50 motion-reduce:hover:translate-y-0;
 }

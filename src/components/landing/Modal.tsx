@@ -6,14 +6,12 @@ import { ArrowRight, CircleCheck, X } from "lucide-react";
 const ID = "modal-early";
 const dialog = () => document.getElementById(ID) as HTMLDialogElement;
 
-/** Opens the early access <Modal>; usable from server components. */
 export function ModalButton(props: ComponentProps<"button">) {
   return <button type="button" aria-haspopup="dialog" onClick={() => dialog().showModal()} {...props} />;
 }
 
 const field = "min-h-11 w-full rounded-md border border-border bg-surface px-3 text-small outline-accent";
 
-/** Early access dialog. Native <dialog>: focus trap, Escape and inert page come free. */
 export function Modal() {
   const [sent, setSent] = useState(false);
   const submit = (e: FormEvent) => {
@@ -26,7 +24,6 @@ export function Modal() {
       id={ID}
       aria-labelledby={`${ID}-title`}
       onClose={() => setSent(false)}
-      // The content fills the dialog, so a click on the element itself is a backdrop click.
       onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
       className="m-auto w-[min(100%-2.5rem,510px)] rounded-[20px] border border-border bg-surface text-primary shadow-[0_24px_80px_rgba(11,33,23,.23)] open:animate-rise-in backdrop:bg-primary/50 backdrop:backdrop-blur-[5px] open:backdrop:animate-fade-in"
     >

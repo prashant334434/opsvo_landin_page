@@ -48,7 +48,9 @@ Every `[bracket]` in `content.md` is replaced; none reach the page.
   "Heavier than Option B" are both true.
 - Source line: "Price and size listed by Travelkart, checked 14 Oct 2026." Travelkart is
   fictional.
-- The last three FAQ answers are short stand-ins, marked as placeholders in the code.
+- The last three FAQ answers ("What happens to what I tell it?", "Which stores and categories
+  are covered?" and "How much does it cost?") are short stand-ins, because `content.md` leaves
+  them as placeholders.
 
 ## Part 1: the table on narrow screens
 

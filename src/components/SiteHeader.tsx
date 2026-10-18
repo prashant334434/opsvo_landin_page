@@ -5,19 +5,8 @@ import { nav } from "@/content";
 import { createTopDockController, type TopDockOptions } from "./dock/topDockController";
 import "./dock/command-bar.css";
 
-/*
- * ThreeUI AnimatedTopDock, Command Bar variant, light-themed: one inset bar
- * with the wordmark, the proximity dock (items spring wider and down as the
- * pointer crosses them) and the actions. Hides on scroll down, returns on
- * scroll up or when anything inside it takes keyboard focus. Responsive steps
- * live in command-bar.css: icons-only dock at <=900px, Menu panel below 600px.
- */
-
-// Configured values from the integration brief. lockTrack pins the dock to its
-// rest width so growing items overflow it instead of shoving the bar around.
 const DOCK: TopDockOptions = { proximity: 122, spring: 0.19, damping: 0.7, widthGrowth: 17, heightGrowth: 16, drop: 3.5, axis: "x", lockTrack: true };
 
-// Stroke icons on the source's 16px grid.
 const ICONS: Record<string, ReactNode> = {
   "#how-it-works": <><circle cx="3" cy="8" r="1.5" /><circle cx="12.5" cy="3.5" r="1.5" /><circle cx="12.5" cy="12.5" r="1.5" /><path d="M4.5 7.3 11 4.2M4.5 8.7l6.5 3.1" /></>,
   "#compare": <><rect x="2" y="2.5" width="5" height="11" rx="1" /><rect x="9" y="2.5" width="5" height="11" rx="1" /></>,
@@ -39,7 +28,6 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [signInNotice, setSignInNotice] = useState(false);
 
-  // Scroll spy: the section crossing the middle of the viewport is "in view".
   useEffect(() => {
     const sections = nav.links.map((l) => document.querySelector(l.href)).filter((s): s is Element => !!s);
     const io = new IntersectionObserver(
@@ -49,7 +37,6 @@ export function SiteHeader() {
       { rootMargin: "-45% 0px -50% 0px" },
     );
     sections.forEach((s) => io.observe(s));
-    // Above the first section (the hero) nothing is active.
     const first = sections[0];
     const onScroll = () => {
       if (first && first.getBoundingClientRect().top > innerHeight * 0.5) setActive(null);
@@ -61,8 +48,6 @@ export function SiteHeader() {
     };
   }, []);
 
-  // Hide on scroll down, show on scroll up. Small deltas are ignored to avoid flicker.
-  // Stays put while the hero film's scroll track is pinned.
   useEffect(() => {
     let last = scrollY;
     const hero = document.querySelector<HTMLElement>("[data-hero-track]");
@@ -77,11 +62,8 @@ export function SiteHeader() {
     return () => removeEventListener("scroll", onScroll);
   }, []);
 
-  // The source's spring controller. It turns itself off for reduced motion,
-  // coarse pointers and viewports under 600px.
   useEffect(() => createTopDockController(dock.current!, () => DOCK), []);
 
-  // Menu: close on Escape (focus back to the button) or a click outside the header.
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -128,7 +110,6 @@ export function SiteHeader() {
 
       <div className="cmdbar-frame">
         <div className="cmdbar">
-          {/* Wordmark as text; no logo in scope, so no brand mark disc. */}
           <a href="#" className="cmdbar__brand">
             Opsvo
           </a>
@@ -140,7 +121,6 @@ export function SiteHeader() {
                 href={l.href}
                 data-dock-item
                 className="cmdbar__item"
-                // Names the link when the label collapses to an icon at <=900px.
                 aria-label={l.label}
                 aria-current={active === l.href ? "location" : undefined}
               >
@@ -168,7 +148,6 @@ export function SiteHeader() {
               aria-controls="site-menu"
               className="cmdbar__menu"
             >
-              {/* Two bars that cross into an X when open. */}
               <span aria-hidden="true" className="relative block h-3 w-4">
                 <span className={`absolute left-0 block h-0 w-4 border-t-2 border-primary transition-transform ${menuOpen ? "top-1 rotate-45" : "top-0"}`} />
                 <span className={`absolute left-0 block h-0 w-4 border-t-2 border-primary transition-transform ${menuOpen ? "top-1 -rotate-45" : "top-2"}`} />
@@ -178,7 +157,6 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Below 600px the dock hands over to this labelled panel. */}
         {menuOpen && (
           <div id="site-menu" className="mx-auto mt-2 w-(--atd-bar-width) min-[600px]:hidden">
             <div className="rounded-lg border border-border bg-surface/90 p-2 shadow-lg backdrop-blur-xl">

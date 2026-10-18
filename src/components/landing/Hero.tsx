@@ -3,26 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
-/*
- * Fixed, scroll-scrubbed film. A 540vh invisible track supplies scroll distance;
- * a sticky frame holds video, veils, panels, footer and meter, so nothing on
- * screen moves while the track is in view. One rAF loop (only while the track
- * is visible) reads progress from the track rect and drives everything:
- *   targetTime = progress × DURATION, eased toward, then seeked.
- * Panels use the same eased time, so text never drifts from its frames.
- *
- * Media (cut from public/videos/Timeline 1.mov, which stays untouched):
- * 8.2s of film, ending before the clip's built-in comparison UI, plus a 1.4s
- * hold on the final frame so the last panel gets dwell time. H.264, keyframe
- * every 6 frames, no B-frames, no audio. Loaded whole into a blob when the
- * server reports progress; falls back to a plain range-request src.
- */
-
-const DURATION = 9.625; // seconds, incl. the 1.4s end hold
+const DURATION = 9.625;
 const SRC = { lg: "/videos/hero-scrub.mp4", sm: "/videos/hero-scrub-sm.mp4" };
 const POSTER = "/images/hero-poster.jpg";
 
-const s = (sec: number) => sec / DURATION; // footage seconds → normalized progress
+const s = (sec: number) => sec / DURATION;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smoothstep = (a: number, b: number, x: number) => {
   if (b <= a) return x >= a ? 1 : 0;
@@ -30,14 +15,10 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-// Cues: [fade-in start, fade-in end, fade-out start, fade-out end] in progress.
-// Windows sit on shots where the product clears the text column; the gaps
-// between them are deliberate video-only intervals (the close-ups, the turn).
 type Panel = { cue: [number, number, number, number]; side: "left" | "right"; eyebrow: string; title: string; copy: string; cta?: [string, string] };
 const PANELS: Panel[] = [
   { cue: [0, 0, s(3.15), s(3.55)], side: "left", eyebrow: "A better way to choose", title: "Travel, considered.", copy: "Find the right carry for the way you move.", cta: ["Explore the collection", "#compare"] },
   { cue: [s(6.3), s(6.6), s(7.3), s(7.6)], side: "left", eyebrow: "Design, in detail", title: "Every detail has a purpose.", copy: "Look closer at the shape, finish and details that define your next carry." },
-  // Final frame puts the suitcase left of centre, so this one sits right.
   { cue: [s(7.95), s(8.35), 2, 2], side: "right", eyebrow: "Choose with clarity", title: "The right choice starts here.", copy: "Compare the details that matter before you decide.", cta: ["Compare products", "#compare-table"] },
 ];
 
@@ -49,8 +30,6 @@ const CHAPTERS: [from: number, label: string][] = [
   [7.75, "The decision"],
 ];
 
-// Product centre (x % of frame) over time; portrait screens crop the 16:9
-// film hard, so object-position follows the suitcase. Measured from the footage.
 const FOCUS: [t: number, x: number][] = [[0, 66], [1.5, 63], [2.5, 59], [3, 56], [3.5, 51], [4.9, 52], [5.4, 58], [5.7, 60], [6, 52], [7, 50], [7.9, 47], [8.2, 44]];
 const focusAt = (t: number) => {
   let i = 1;
@@ -68,7 +47,7 @@ export function Hero() {
   const track = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const panels = useRef<(HTMLDivElement | null)[]>([]);
-  const veils = useRef<(HTMLDivElement | null)[]>([]); // left, right, bottom (portrait)
+  const veils = useRef<(HTMLDivElement | null)[]>([]);
   const meter = useRef<HTMLSpanElement>(null);
   const chapterNo = useRef<HTMLSpanElement>(null);
   const chapterLabel = useRef<HTMLSpanElement>(null);
@@ -82,8 +61,6 @@ export function Hero() {
     seekable.current = phase === "ready";
   }, [phase]);
 
-  // Load: stream into a blob with real progress, else fall back to a range-request
-  // src. Every path ends in "ready" or "poster", so the loader can't trap anyone.
   useEffect(() => {
     const v = video.current!;
     const lite = matchMedia("(prefers-reduced-motion: reduce)").matches || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
@@ -106,7 +83,6 @@ export function Hero() {
       fill.style.transform = f === null ? "" : `scaleX(${f})`;
       text.textContent = f === null ? "Loading" : `${Math.round(f * 100)}%`;
     };
-    // Give up to the poster after 20s or on error; a late download still upgrades to the film.
     const giveUp = () => setPhase((p) => (p === "loading" ? "poster" : p));
     const cap = setTimeout(giveUp, 20_000);
     const onError = giveUp;
@@ -144,9 +120,9 @@ export function Hero() {
         v.src = url;
       } catch {
         clearTimeout(watchdog);
-        if (ctrl.signal.aborted && !stalled) return; // unmounted
+        if (ctrl.signal.aborted && !stalled) return;
         report(null);
-        v.src = src; // stalled, CORS or HTTP error: let the browser stream it
+        v.src = src;
       }
     })();
 
@@ -162,7 +138,6 @@ export function Hero() {
     };
   }, []);
 
-  // The single rAF loop. Runs only while the track is on screen.
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = track.current!;
@@ -178,9 +153,7 @@ export function Hero() {
     let focus = "";
     const prev = PANELS.map(() => "");
 
-    // Never let the film run on its own (media keys, the iOS unlock below).
     const onPlay = () => v.pause();
-    // Seek cost: if this device can't keep up, hold the frame and let text carry on.
     const onSeeked = () => {
       if (!seekAt) return;
       const ms = performance.now() - seekAt;
@@ -188,8 +161,6 @@ export function Hero() {
       ema = samples++ ? ema * 0.8 + ms * 0.2 : ms;
       if (samples > 12 && ema > 160) slow = true;
     };
-    // iOS won't decode a never-played video; a muted play() on first touch
-    // unlocks it, and onPlay pauses it immediately.
     const unlock = () => v.play().catch(() => {});
     v.addEventListener("play", onPlay);
     v.addEventListener("seeked", onSeeked);
@@ -238,7 +209,6 @@ export function Hero() {
         chapterLabel.current!.textContent = CHAPTERS[c][1];
       }
 
-      // Portrait: keep the suitcase centred in the hard 16:9 crop.
       const { clientWidth: w, clientHeight: h } = v;
       const img = h * (16 / 9);
       const pos = w < h && img > w ? `${(clamp01((w / 2 - (focusAt(t) / 100) * img) / (w - img)) * 100).toFixed(1)}% 50%` : "50% 50%";
@@ -279,8 +249,6 @@ export function Hero() {
           className="absolute inset-0 size-full object-cover"
         />
 
-        {/* Veils: a faint wash everywhere, a side wash under whichever panel is up
-            (bottom wash on portrait), then fine grain. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-ivory/[.07]" />
         <div ref={(n) => { veils.current[0] = n; }} aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-r from-ivory/75 to-transparent to-45% portrait:hidden" style={{ opacity: 1 }} />
         <div ref={(n) => { veils.current[1] = n; }} aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-l from-ivory/75 to-transparent to-45% portrait:hidden" style={{ opacity: 0 }} />

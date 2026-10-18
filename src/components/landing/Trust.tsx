@@ -6,12 +6,6 @@ import { OPTIONS } from "./Compare";
 import { useReveal } from "./motion";
 import { EditorialHead, bg, stagger } from "./ui";
 
-/*
- * The project has no real source URLs or last-checked timestamps, so nothing
- * here invents them: link and date slots say so plainly. The "missing" states
- * come from the Compare section's own illustrative data (Option C).
- */
-
 const C = OPTIONS[2];
 const FACTS: { label: string; value: string; status: "shown" | "unverified" | "missing" }[] = [
   { label: "Price", value: C.price, status: "shown" },
@@ -29,7 +23,7 @@ const CARDS = [
 ];
 
 const micro = "text-[11px] tracking-[.18em] uppercase text-charcoal/50";
-const amber = "text-[#8a6a2a]"; // muted amber, only on "not verified"
+const amber = "text-[#8a6a2a]";
 
 function Status({ status, value }: { status: (typeof FACTS)[number]["status"]; value: string }) {
   if (status === "shown") return <span className="tabular-nums">{value}</span>;
@@ -40,7 +34,6 @@ function Status({ status, value }: { status: (typeof FACTS)[number]["status"]; v
   );
 }
 
-// What each card previews in its compact state (hover, focus or while open).
 function CardPreview({ i }: { i: number }) {
   if (i === 0)
     return (
@@ -90,7 +83,6 @@ function EvidencePanel({ view, onClose }: { view: number; onClose: () => void })
 
       <div key={view} className="mt-5 animate-rise-in">
         {view === 1 ? (
-          // Thin horizontal timeline: each step's date stays empty because none exists yet.
           <ol className="grid gap-4 sm:grid-cols-4 sm:gap-0">
             {TIMELINE.map((step, i) => (
               <li key={step} className="relative flex gap-3 sm:block sm:pr-4">
@@ -144,10 +136,6 @@ export function Trust() {
 
   return (
     <section ref={ref} id="trust" className="relative isolate overflow-hidden border-t border-charcoal/10 bg-ivory font-editorial text-charcoal">
-      {/* Suitcase detail: a right-hand band on desktop, a top band on mobile, dissolved
-          into the page with ivory fades so it never reads as a separate banner. */}
-      {/* Fixed height on desktop: a full-height band would upscale the crop into a blur,
-          and grow further whenever the evidence preview opens. */}
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-72 sm:h-96 lg:top-10 lg:right-0 lg:left-auto lg:h-[min(46vw,720px)] lg:w-[46%]">
         <div className="photo absolute inset-0 bg-[62%_60%]" style={bg("/images/trust-detail.jpg")} />
         <div className="absolute inset-0 bg-linear-to-t from-ivory via-ivory/40 via-35% to-transparent lg:bg-linear-to-r lg:from-ivory lg:via-ivory/55 lg:via-30% lg:to-transparent lg:to-70%" />
@@ -163,7 +151,6 @@ export function Trust() {
 
           <div className="mt-12 grid gap-3 sm:grid-cols-3 md:mt-14">
             {CARDS.map(({ Icon, title, text }, i) => (
-              // Entrance and hover lift live on separate elements so their transitions don't collide.
               <div key={title} className="reveal" style={stagger(i + 3)}>
               <button
                 type="button"
@@ -186,7 +173,6 @@ export function Trust() {
             ))}
           </div>
 
-          {/* Evidence preview: opened by a card, never a permanent panel. */}
           <div
             id="evidence-trail"
             inert={open === null}

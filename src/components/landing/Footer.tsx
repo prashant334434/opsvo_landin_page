@@ -3,7 +3,6 @@
 import { useReveal } from "./motion";
 import { stagger } from "./ui";
 
-/** Minimal brand footer: wordmark and tagline, a brand line, and the copyright. */
 export function Footer() {
   const ref = useReveal<HTMLElement>();
 

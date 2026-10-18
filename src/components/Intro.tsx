@@ -2,19 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/*
- * Load intro: particles rise like embers, assemble into the wordmark, hold,
- * then drift up and dissolve to reveal the page. 2D canvas, no three.js, so it
- * can start before the hero scene has loaded.
- *
- * Server-rendered as a solid canvas-coloured cover so the page never flashes
- * first. CSS in globals.css hides it under reduced motion, and after 8s as a
- * failsafe if JS never runs.
- */
-
 const NAME = "Opsvo";
-const ASSEMBLE = 1900; // ms until the last particle lands
-const FLIGHT = 1100; // ms each particle spends travelling
+const ASSEMBLE = 1900;
+const FLIGHT = 1100;
 const HOLD = 900;
 const EXIT = 800;
 const EMBERS = 90;
@@ -22,7 +12,6 @@ const EMBERS = 90;
 const easeOut = (x: number) => 1 - (1 - x) ** 3;
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
-/** Target points: every `gap` px inside the rendered word. */
 function sampleWord(w: number, h: number, family: string) {
   const size = Math.min(w * 0.22, 220);
   const c = document.createElement("canvas");
@@ -38,7 +27,6 @@ function sampleWord(w: number, h: number, family: string) {
   const pts: number[] = [];
   for (let y = 0; y < h; y += gap)
     for (let x = 0; x < w; x += gap) if (data[(y * w + x) * 4 + 3] > 128)
-        // Scatter within the cell so the word reads as grain, not a dot grid.
         pts.push(x + (Math.random() - 0.5) * gap, y + (Math.random() - 0.5) * gap);
   return pts;
 }
@@ -49,7 +37,6 @@ export function Intro() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    // globals.css already hides .intro under reduced motion; nothing to run.
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const el = root.current!;
@@ -80,7 +67,6 @@ export function Intro() {
 
       const pts = sampleWord(w, h, getComputedStyle(document.body).fontFamily);
       const n = pts.length / 2;
-      // Per particle: start x/y, target x/y, launch delay, wobble phase, exit drift.
       const sx = new Float32Array(n), sy = new Float32Array(n);
       const tx = new Float32Array(n), ty = new Float32Array(n);
       const delay = new Float32Array(n), phase = new Float32Array(n), drift = new Float32Array(n);
@@ -88,8 +74,7 @@ export function Intro() {
         tx[i] = pts[i * 2];
         ty[i] = pts[i * 2 + 1];
         sx[i] = tx[i] + (Math.random() - 0.5) * w * 0.5;
-        sy[i] = h + Math.random() * h * 0.4; // rise from below, like embers
-        // Sweep left to right so the word writes itself in.
+        sy[i] = h + Math.random() * h * 0.4;
         delay[i] = (tx[i] / w) * (ASSEMBLE - FLIGHT) * 0.7 + Math.random() * (ASSEMBLE - FLIGHT) * 0.3;
         phase[i] = Math.random() * Math.PI * 2;
         drift[i] = 40 + Math.random() * 140;
@@ -126,7 +111,6 @@ export function Intro() {
           let x = sx[i] + (tx[i] - sx[i]) * e + Math.sin(phase[i] + t * 0.006) * wob;
           let y = sy[i] + (ty[i] - sy[i]) * e;
           if (p === 1) {
-            // Settled: a faint shimmer so the word stays alive while it holds.
             x += Math.sin(phase[i] + t * 0.003) * 0.4;
             y += Math.cos(phase[i] + t * 0.0025) * 0.4;
           }
@@ -134,7 +118,6 @@ export function Intro() {
             y -= exit * exit * drift[i];
             x += Math.sin(phase[i]) * exit * 30;
           }
-          // Particles flicker while flying, steady once landed.
           ctx.globalAlpha = fade * (p < 1 ? 0.4 + 0.6 * e : 0.75 + 0.25 * Math.sin(phase[i] + t * 0.005));
           ctx.fillRect(x, y, 1.8, 1.8);
         }
@@ -166,7 +149,6 @@ export function Intro() {
   return (
     <div ref={root} className="intro fixed inset-0 z-[60] bg-canvas">
       <canvas ref={canvas} aria-hidden="true" className="absolute inset-0 h-full w-full" />
-      {/* No handler needed: clicks hit the overlay's pointerdown, Enter/Space hit the keydown listener. */}
       <button
         type="button"
         className="absolute right-4 bottom-4 inline-flex min-h-tap items-center rounded-md px-4 text-label text-secondary transition-colors duration-[120ms] hover:text-primary md:right-8"

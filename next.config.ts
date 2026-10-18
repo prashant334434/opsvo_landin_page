@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  devIndicators: false, // hide the floating dev badge; compile/runtime errors still show
+  output: "standalone",
+  devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

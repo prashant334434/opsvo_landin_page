@@ -1,12 +1,9 @@
-// Image placeholders: drop files into /public/images with these names.
 export const bg = (src: string) => ({ backgroundImage: `url(${src})` });
 
-/** Entrance order for `.reveal` elements. */
 export const stagger = (i: number) => ({ "--i": i }) as React.CSSProperties;
 
 type HeadProps = { n: string; label: string; title: string; aside?: React.ReactNode; children: React.ReactNode };
 
-/** Section heading in the hero's editorial voice (Inter Tight, ivory/forest). */
 export function EditorialHead({ n, label, title, aside, children }: HeadProps) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">

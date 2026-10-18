@@ -1,11 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
 
-/**
- * Pointer-driven spring tilt for `.tilt` surfaces. Writes CSS vars on the element
- * (--rx/--ry in degrees, --px/--py in -1…1 for parallax) from a rAF spring that
- * only runs while moving, so React never re-renders. `[data-magnet]` children
- * drift up to 4px toward the pointer. Fine pointers only; off for reduced motion.
- */
 export function useTilt(ref: RefObject<HTMLElement | null>, max = 5) {
   useEffect(() => {
     const el = ref.current;
@@ -23,7 +17,7 @@ export function useTilt(ref: RefObject<HTMLElement | null>, max = 5) {
       const dt = Math.min(0.032, (now - (last || now)) / 1000 || 0.016);
       last = now;
       for (const k of ["x", "y"] as const) {
-        vel[k] += (170 * (target[k] - pos[k]) - 24 * vel[k]) * dt; // stiffness 170, damping 24: settles without bounce
+        vel[k] += (170 * (target[k] - pos[k]) - 24 * vel[k]) * dt;
         pos[k] += vel[k] * dt;
       }
       el.style.setProperty("--px", pos.x.toFixed(4));
@@ -31,7 +25,6 @@ export function useTilt(ref: RefObject<HTMLElement | null>, max = 5) {
       el.style.setProperty("--rx", (-pos.y * max).toFixed(3));
       el.style.setProperty("--ry", (pos.x * max).toFixed(3));
       const settled = Math.abs(target.x - pos.x) + Math.abs(target.y - pos.y) + Math.abs(vel.x) + Math.abs(vel.y) < 0.002;
-      // Back at rest: drop the inline vars so CSS (focus/tap presets) can set them.
       if (settled && !target.x && !target.y) for (const v of ["--px", "--py", "--rx", "--ry"]) el.style.removeProperty(v);
       raf = settled ? 0 : requestAnimationFrame(step);
     };
@@ -41,7 +34,7 @@ export function useTilt(ref: RefObject<HTMLElement | null>, max = 5) {
       raf = requestAnimationFrame(step);
     };
 
-    const enter = () => (rect = el.getBoundingClientRect()); // rest-state rect, so the tilt can't feed back into itself
+    const enter = () => (rect = el.getBoundingClientRect());
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       target.x = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1));
@@ -73,11 +66,6 @@ export function useTilt(ref: RefObject<HTMLElement | null>, max = 5) {
   }, [ref, max]);
 }
 
-/**
- * Arms `.reveal` children: sets data-reveal="pending" on the element until it first
- * enters view, then "in" for good, so small scrolls never replay it. Skipped when
- * already on screen at mount or under reduced motion, so content is never hidden.
- */
 export function useReveal<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   useEffect(() => {

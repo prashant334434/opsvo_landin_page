@@ -6,21 +6,13 @@ import { ModalButton } from "./Modal";
 import { useReveal, useTilt } from "./motion";
 import { EditorialHead, bg, stagger } from "./ui";
 
-/*
- * Questions and answers from content.md. The last three are placeholders there
- * ("unresolved on our side"); the answers below are short stand-ins marked
- * "Placeholder" and must be confirmed before launch.
- */
 const FAQS = [
   { id: "what-is-opsvo", q: "What is Opsvo?", a: "An AI shopping companion. You describe what you need, and it returns a short list of suitable products with reasons, comparisons and sources." },
   { id: "does-opsvo-buy", q: "Does Opsvo buy things for me?", a: "No, not without your approval. Opsvo hands you to the retailer to complete your purchase. Any action that spends money or shares your details needs your explicit confirmation first." },
   { id: "product-sources", q: "Where do prices and product details come from?", a: "From retailers and other sources Opsvo can access. Each fact shows its source and when it was last checked. Prices and stock can change, so the retailer’s checkout is final." },
   { id: "product-ranking", q: "How are products ranked?", a: "By how well they match the requirements you gave." },
-  // Placeholder: data use, retention and deletion; link the privacy policy once it exists.
   { id: "data-use", q: "What happens to what I tell it?", a: "Opsvo uses what you type to find and explain matches. It isn’t sold, and you can ask for it to be deleted. The privacy policy will set out exactly what is kept and for how long." },
-  // Placeholder: launch retailers, categories and countries.
   { id: "coverage", q: "Which stores and categories are covered?", a: "At launch, Opsvo covers travel gear from a small set of retailers in India. More categories and stores will follow." },
-  // Placeholder: pricing.
   { id: "cost", q: "How much does it cost?", a: "Free during early access." },
 ];
 
@@ -32,10 +24,9 @@ export function Faq() {
   const stage = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState<string | null>(null); // closed by default; one open at a time
-  useTilt(stage, 0); // parallax vars only; no rotation (fine pointers, motion allowed)
+  const [open, setOpen] = useState<string | null>(null);
+  useTilt(stage, 0);
 
-  // Links such as #faq-cost open their answer.
   useEffect(() => {
     const sync = () => {
       const id = location.hash.replace("#faq-", "");
@@ -57,7 +48,6 @@ export function Faq() {
     setQuery("");
     input.current?.focus();
   };
-  // Arrow keys, Home and End move between questions (WAI-ARIA accordion pattern).
   const move = (e: KeyboardEvent<HTMLButtonElement>) => {
     const all = [...document.querySelectorAll<HTMLButtonElement>("[data-faq-trigger]")];
     const i = all.indexOf(e.currentTarget);
@@ -75,9 +65,7 @@ export function Faq() {
             The most common questions about how Opsvo works. Can’t find yours? We’re happy to help.
           </EditorialHead>
 
-          {/* Image layer drifts a few px under the pointer; the card counter-drifts for depth. */}
           <div ref={stage} className="reveal relative mt-12" style={stagger(3)}>
-            {/* Crops keep the whole suitcase (~20–76% down the still) in frame at every width. */}
             <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-sand md:aspect-[3/2] lg:aspect-[4/5]">
               <div
                 role="img"
@@ -87,7 +75,6 @@ export function Faq() {
               />
             </div>
             <div
-              // Floats over the plinth only on desktop's tall crop; below the image elsewhere so it never covers the suitcase.
               className="relative mt-3 flex flex-col gap-4 rounded-[8px] border border-border bg-[#faf9f6]/95 p-5 shadow-[0_18px_40px_-28px_rgb(13_12_11/.4)] sm:flex-row sm:items-center sm:justify-between lg:absolute lg:inset-x-5 lg:bottom-5 lg:mt-0"
               style={{ translate: "calc(var(--px, 0) * 4px) calc(var(--py, 0) * 3px)" }}
             >
@@ -146,7 +133,6 @@ export function Faq() {
                         className={`group/q flex min-h-16 w-full items-center justify-between gap-6 py-5 text-left text-[17px] tracking-[-.015em] outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest md:text-lg ${isOpen ? "text-forest" : "hover:text-forest"}`}
                       >
                         {f.q}
-                        {/* Plus: the vertical stroke rotates flat into a minus. */}
                         <span
                           aria-hidden="true"
                           className={`relative grid size-9 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${isOpen ? "border-forest bg-forest text-ivory" : "border-border text-charcoal group-hover/q:border-charcoal/30"}`}

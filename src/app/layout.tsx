@@ -5,8 +5,6 @@ import "./globals.css";
 const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 const interTight = Inter_Tight({ variable: "--font-inter-tight", subsets: ["latin"], weight: ["400", "500"] });
 
-// Copy from content.md. The OG image is referenced but not exported yet (file intentionally missing).
-// Set NEXT_PUBLIC_SITE_URL in production so crawlers get an absolute og:image URL.
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Opsvo: AI shopping companion with explained recommendations",

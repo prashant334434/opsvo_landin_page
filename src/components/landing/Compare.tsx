@@ -5,14 +5,6 @@ import { ArrowRight, Check, Heart } from "lucide-react";
 import { useReveal, useTilt } from "./motion";
 import { EditorialHead, bg, stagger } from "./ui";
 
-/*
- * Showroom + comparison, copy from content.md. Bracketed placeholders there are
- * filled with plausible illustrative values (prices under the doc's ₹15,000
- * example budget; A is the heaviest, as its "worth knowing" notes say).
- * Only Option A has imagery (a still from the hero film); B and C show an
- * explicit no-image state instead of a generated picture.
- */
-
 type Cell = string | { text: string; tone: "ok" | "missing" };
 type Option = {
   name: string; price: string; weight: string; fits: boolean; warranty: string | null; delivery: string; note: string;
@@ -41,7 +33,6 @@ const ROWS: { label: string; why: string; get: (o: Option) => Cell }[] = [
   { label: "Worth knowing", why: "The trade-off most likely to change your mind about this option.", get: (o) => o.note },
 ];
 
-// Visible features only, as % of the stage still (960×1080).
 const LABELS = [
   { text: "Telescopic handle", x: 54, y: 17, side: "r" },
   { text: "Ribbed shell", x: 37.5, y: 48, side: "l" },
@@ -73,7 +64,6 @@ export function Compare() {
   useTilt(stage, 3.5);
 
   const o = OPTIONS[sel];
-  // Arrow keys move between options, like a segmented control.
   const onKey = (e: KeyboardEvent, i: number) => {
     const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
     if (!d) return;
@@ -92,7 +82,6 @@ export function Compare() {
         </EditorialHead>
 
         <div className="mt-14 grid items-start gap-12 md:mt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.08fr)] lg:gap-16">
-          {/* Showroom stage: tilts as a whole; the image layer parallaxes inside it. */}
           <div className="reveal min-w-0 perspective-[1400px]" style={stagger(3)}>
             <div ref={stage} className="tilt relative rounded-[6px]">
               <div className="relative aspect-[8/9] overflow-hidden rounded-[6px] bg-sand">
@@ -125,14 +114,10 @@ export function Compare() {
                     )}
                   </div>
                 ))}
-                {/* Soft top light, consistent with the hero's daylight. */}
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_70%_at_50%_0%,rgb(255_255_255/.16),transparent_65%)]" />
               </div>
 
-              {/* Detail plate overlaps only the plinth's front edge and floats above the tilt. */}
               <div aria-live="polite" className="relative mx-3 -mt-10 rounded-[4px] border border-border bg-[#faf9f6] p-5 shadow-[0_18px_40px_-30px_rgb(13_12_11/.35)] translate-z-8 sm:mx-5">
-                {/* Sample shortlist card (content.md). Option A carries the full card copy;
-                    B and C show what the table says about them. */}
                 <div key={sel} className="animate-rise-in">
                   <p className={micro}>Illustrative example</p>
                   <div className="mt-1.5 flex items-start justify-between gap-4">
@@ -178,7 +163,6 @@ export function Compare() {
                     >
                       <Heart className="size-4" fill={saved[sel] ? "currentColor" : "none"} /> {saved[sel] ? "Saved" : "Save"}
                     </button>
-                    {/* No real retailer link exists for illustrative data, so this stays inert and says why. */}
                     <button
                       type="button"
                       aria-disabled="true"
@@ -194,8 +178,6 @@ export function Compare() {
             </div>
           </div>
 
-          {/* Comparison: three selectable columns; rows explain themselves on hover/focus.
-              min-w-0 keeps the 520px table scrolling inside its region instead of widening the page. */}
           <div id="compare-table" className="reveal min-w-0 scroll-mt-28" style={stagger(4)}>
             <p className={`${micro} mb-4`}>Illustrative example</p>
             <div role="region" aria-label="Comparison of three illustrative options" tabIndex={0} className="overflow-x-auto outline-none focus-visible:outline-2 focus-visible:outline-forest">
@@ -250,7 +232,6 @@ export function Compare() {
               </table>
             </div>
 
-            {/* Visual explanation slot; screen readers get each row's explanation inline. */}
             <p aria-hidden="true" className="mt-6 min-h-[4.5em] border-t border-border pt-4 text-[15px] text-charcoal/60">
               {row === null ? (
                 "Hover or focus a row to see why it matters. Choose an option to bring it to the stage."

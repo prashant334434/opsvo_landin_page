@@ -6,12 +6,6 @@ import { ModalButton } from "./Modal";
 import { useReveal, useTilt } from "./motion";
 import { EditorialHead, bg, stagger } from "./ui";
 
-/*
- * Two-column composition: copy and benefits left; a stable product scene right
- * with a tilting retailer-preview card overlapping its plinth. The chart is
- * illustrative only (no axes, no figures) and grows once on first view.
- */
-
 const BENEFITS = [
   { Icon: Users, title: "Quality traffic", text: "Relevant shoppers, not just browsers." },
   { Icon: ChartColumn, title: "Transparent comparison", text: "Your product details shown fairly." },
@@ -26,7 +20,7 @@ const ROWS = [
   { Icon: TrendingUp, label: "More qualified traffic" },
 ];
 
-const BARS = [28, 40, 34, 52, 64, 86]; // relative heights only; not data
+const BARS = [28, 40, 34, 52, 64, 86];
 
 export function Retailers() {
   const section = useReveal<HTMLElement>();
@@ -61,11 +55,9 @@ export function Retailers() {
           </ul>
         </div>
 
-        {/* Product scene stays flat and undistorted; only the preview card tilts. */}
         <div className="reveal relative lg:pl-[10%]" style={stagger(3)}>
           <div role="img" aria-label="Forest green cabin suitcase on a travertine plinth beneath stone arches" className="photo aspect-[4/3] rounded-[6px] bg-[center_40%]" style={bg("/images/retailers-scene.jpg")} />
 
-          {/* Overlaps only plinth and floor: the suitcase sits at ~36–63% across, wheels at ~85% down. */}
           <div ref={chartArea} className="relative z-10 mx-4 -mt-6 perspective-[1100px] sm:mx-auto sm:w-[min(340px,80%)] lg:absolute lg:bottom-[-6%] lg:left-[-6%] lg:mx-0 lg:mt-0 lg:w-[min(300px,42%)]">
             <div
               ref={card}
@@ -73,7 +65,6 @@ export function Retailers() {
               aria-label="Illustrative retailer preview"
               data-open={lifted || undefined}
               onPointerUp={(e) => e.pointerType !== "mouse" && setLifted((v) => !v)}
-              // Keyboard focus and a tap get a fixed, gentle tilt in place of the pointer.
               className="tilt rounded-[6px] border border-border bg-[#faf9f6] p-4 outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest motion-safe:focus-visible:[--rx:3] motion-safe:focus-visible:[--ry:-4] motion-safe:data-open:[--rx:3] motion-safe:data-open:[--ry:-4]"
             >
               <div className="translate-z-3">
